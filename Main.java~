@@ -15,9 +15,7 @@ import java.awt.*;
 public class Main {
     
     static File file = new File("/Users/arjunaryansingh/Desktop/DataTest/data.html");
-    // static int groupCounter = 1;
-    static int sampleCounter = 0;
-
+    
     public static List<String> extractGeneID() throws IOException {
         Document doc = Jsoup.parse(file, "UTF-8");
         List<String> geneList = new ArrayList<String>();
@@ -51,34 +49,16 @@ public class Main {
         List<String> geneID = extractGeneID();
         List<String> idData = new ArrayList<String>(new ArrayList<String>());
         List<String> expressionData = getExpressionData();
-    	List<String> groups = getGroups();
-        int groupsCounter = 0;
-        int test = 0;
-        System.out.println(geneNames.size());
+	List<String> groups = getGroups();
 
         for (int i = 0; i < geneNames.size(); i++) {
             List<String> current = new ArrayList<String>();
-	        current.add(geneNames.get(geneNames.size() - i - 1) + "," + geneID.get(geneID.size() - i - 1));
-            current.add(groups.get(0));
-            int valueLocation = 0;
-            int groupCounter = 1;
-
-            for (int n = sampleCounter; n < (expressionData.size() / geneNames.size()) + sampleCounter; n++) {    
-                current.add(expressionData.get(n));    
-                valueLocation++;
-                if (valueLocation == Integer.parseInt(groups.get(groupCounter))) {
-                    valueLocation = 0;
-                    groupCounter += 2;
-                    try {
-                        current.add(groups.get(groupCounter - 1));    
-                    } catch (Exception e) {}
-                }
-            }
-
-            sampleCounter += (expressionData.size() / geneNames.size());
-            idData.addAll(current); // FIX THIS
+	    for (int n = counter; n < (expressionData.size() / geneID.size()) + counter; n++) {
+                current.add(expressionData.get(n));
+	    }
+	    idData.add(current.toString()); // FIX THIS
         }
-	
+
         return idData;
     }
 
@@ -90,12 +70,14 @@ public class Main {
         for (int i = 0; i < groupNames.size(); i++) {
             String groupHTML = groupNames.get(i).select("input[type=hidden]").attr("value");
             String groupSampleSizeTest = groupNames.get(i).select("span[class=grpSelectedCnt]").text();
-	        Scanner scanner = new Scanner(groupSampleSizeTest);
-	        String size = scanner.next().substring(1);
-	        groups.add(groupHTML);
-	        groups.add(size);
-	   }
+	    Scanner scanner = new Scanner(groupSampleSizeTest);
+	    String size = scanner.next().substring(1);
+	    groups.add(groupHTML);
+	    groups.add(size);
+	}
+
 	return groups;
+	
     }
 
     public static List<String> getExpressionData() throws IOException {
@@ -104,12 +86,14 @@ public class Main {
         Elements sampleTable = doc.select("table[id=sampleTable]");
         List<String> expressionData = new ArrayList<String>(new ArrayList<String>());
         List<String> currentExpressionValue = new ArrayList<String>();
-	   List<String> groupData = getGroups();
+	List<String> groupData = getGroups();
+	int groupNumber;
+	String groupName;
 
         for (int i = 0; i < geneID.size(); i++) {
             Element current = sampleTable.get(i);
             Elements rows = current.select("tr");
-            for (int n = 1; n < rows.size(); n++) { 
+            for (int n = 1; n < rows.size(); n++) {
                 Elements sampleValues = rows.get(n).select("td");
                 currentExpressionValue.add(sampleValues.get(2).html());
                 expressionData.addAll(currentExpressionValue);
@@ -120,7 +104,6 @@ public class Main {
     }
 
         public static void main(String[] args) throws IOException {
-           System.out.println(organizeData());
-    }
+	    organizeData();
+	}
 }
-

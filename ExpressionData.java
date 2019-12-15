@@ -12,8 +12,18 @@ import org.jsoup.select.Elements;
 import javax.swing.*;
 import java.awt.*;
 
-public class Main {
-    
+public class ExpressionData {
+
+    public static List<String> expressionData;
+
+    public ExpressionData() {
+        try {
+         this.expressionData = organizeData();   
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static File file = new File("/Users/arjunaryansingh/Desktop/DataTest/data.html");
     // static int groupCounter = 1;
     static int sampleCounter = 0;
@@ -117,10 +127,6 @@ public class Main {
             }
         }
         return expressionData;
-    }
-
-        public static void main(String[] args) throws IOException {
-           System.out.println(organizeData());
     }
 }
 
