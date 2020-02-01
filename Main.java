@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -14,9 +15,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-
-import javax.swing.*;
-import java.awt.*;
 
 import java.lang.Process;
 
@@ -43,14 +41,12 @@ public class Main {
         Document doc = Jsoup.parse(file, "UTF-8");
         Elements tr = doc.select("tr[class=active loaded], tr[class=loaded active]");
         List<String> geneNames = new ArrayList<String>();
-        int noNameCounter = 1;
 
         for (int i = 0; i < tr.size(); i++) {
             Elements current = tr.get(i).select("td");
             String finalID = current.get(7).text();
             if (finalID.length() == 0) {
-                finalID = "NoName" + noNameCounter;
-                noNameCounter++;
+                finalID = "ID: " + extractGeneID().get(i);
             }
             geneNames.add(finalID);
         }
@@ -82,8 +78,9 @@ public class Main {
         List<String> expressionData = new ArrayList<String>(new ArrayList<String>());
         List<String> currentExpressionValue = new ArrayList<String>();
 	   List<String> groupData = getGroups();
+       //int counter = 1;
 
-        for (int i = 0; i < geneID.size() - 1; i++) {
+        for (int i = 0; i < geneID.size(); i++) {
             Element current = sampleTable.get(i);
             Elements rows = current.select("tr");
             for (int n = 1; n < rows.size(); n++) { 
@@ -100,7 +97,7 @@ public class Main {
 
         try {
 
-            int counter = 1;
+            int counter = 0;
             List<String> groups = getGroups();
             int groupCounter = 0;
 
@@ -127,20 +124,18 @@ public class Main {
 
             // create each column
             List<String> expressionValues = getExpressionData();
-           // bw.write(expressionValues.get(0) + ", ");
-            for (int n = 1; n < test.size() + 1; n++) {
-                bw.write(expressionValues.get(((n - 1) * (expressionValues.size() / geneNames.size() + 1))) + ", ");    
-            }
-            bw.write(groups.get(groupCounter) + "\n");
-            groupCounter++;
 
-
-            for (int n = 1; n < expressionValues.size() / geneNames.size() + 1; n++) {
-                for (int i = 1; i < test.size() + 1; i++) {
-                    bw.write(expressionValues.get(counter) + ", ");
-                    counter += (expressionValues.size() / geneNames.size() + 1);
+            for (int n = 0; n < expressionValues.size() / geneNames.size(); n++) {
+                for (int i = 0; i < test.size() + 1; i++) {
+                    if (i == test.size()) {
+                        bw.write(expressionValues.get(counter) + ", ");
+                        counter += (expressionValues.size() / geneNames.size() + 1);
+                    } else {
+                        bw.write(expressionValues.get(counter) + ", ");
+                        counter += (expressionValues.size() / geneNames.size());
+                    }
                 }
-                bw.write(groups.get(groupCounter) + "\n");
+                bw.write(groups.get(groupCounter) + "\n");   
                 groupCounter++;
                 bw.flush();  
 
@@ -155,5 +150,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         write();
+        
     }
 }
